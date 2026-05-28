@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.weibo.mapper.LikeRecordMapper">
+
+    <select id="find" resultType="com.weibo.entity.LikeRecord">
+        select * from like_record where weibo_id = #{weiboId} and user_id = #{userId}
+    </select>
+
+    <insert id="insert">
+        insert into like_record(weibo_id, user_id) values(#{weiboId}, #{userId})
+    </insert>
+
+    <delete id="delete">
+        delete from like_record where weibo_id = #{weiboId} and user_id = #{userId}
+    </delete>
+
+</mapper>

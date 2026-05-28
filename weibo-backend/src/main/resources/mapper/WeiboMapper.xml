@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.weibo.mapper.WeiboMapper">
+
+    <select id="selectAll" resultType="com.weibo.entity.Weibo">
+        select w.*, u.username, u.avatar from weibo w left join user u on w.user_id = u.id order by w.create_time desc
+    </select>
+
+    <select id="selectByUserId" resultType="com.weibo.entity.Weibo">
+        select w.*, u.username, u.avatar from weibo w left join user u on w.user_id = u.id where w.user_id = #{userId} order by w.create_time desc
+    </select>
+
+    <select id="selectHot" resultType="com.weibo.entity.Weibo">
+        select w.*, u.username, u.avatar from weibo w left join user u on w.user_id = u.id order by w.like_count desc, w.create_time desc
+    </select>
+
+    <select id="searchByContent" resultType="com.weibo.entity.Weibo">
+        select w.*, u.username, u.avatar from weibo w left join user u on w.user_id = u.id where w.content like concat('%', #{q}, '%') order by w.create_time desc
+    </select>
+
+    <select id="getTotalLikesByUser" resultType="int">
+        select coalesce(sum(like_count), 0) from weibo where user_id = #{userId}
+    </select>
+
+    <insert id="insert">
+        insert into weibo(user_id, content, img_url, like_count, create_time)
+        values(#{userId}, #{content}, #{imgUrl}, 0, now())
+    </insert>
+
+    <update id="incrementLike">
+        update weibo set like_count = like_count + 1 where id = #{id}
+    </update>
+
+    <update id="decrementLike">
+        update weibo set like_count = like_count - 1 where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from weibo where id = #{id}
+    </delete>
+
+</mapper>

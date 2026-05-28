@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.weibo.mapper.MessageMapper">
+
+    <insert id="send">
+        insert into message(sender_id, receiver_id, content)
+        values(#{senderId}, #{receiverId}, #{content})
+    </insert>
+
+    <select id="getConversation" resultType="com.weibo.entity.Message">
+        select m.*, u.username as senderName, u.avatar as senderAvatar
+        from message m
+        left join user u on m.sender_id = u.id
+        where (m.sender_id = #{user1} and m.receiver_id = #{user2})
+           or (m.sender_id = #{user2} and m.receiver_id = #{user1})
+        order by m.create_time asc
+    </select>
+
+    <select id="getUnreadCount" resultType="int">
+        select count(*) from message where receiver_id = #{userId} and is_read = 0
+    </select>
+
+    <update id="markAsRead">
+        update message set is_read = 1
+        where ((sender_id = #{user1} and receiver_id = #{user2})
+           or (sender_id = #{user2} and receiver_id = #{user1}))
+          and is_read = 0
+    </update>
+
+    <select id="getConversations" resultType="com.weibo.entity.Message">
+        select m.*, u.username as senderName, u.avatar as senderAvatar
+        from message m
+        left join user u on (case when m.sender_id = #{userId} then m.receiver_id else m.sender_id end) = u.id
+        where m.id in (
+            select max(id) from message
+            where sender_id = #{userId} or receiver_id = #{userId}
+            group by case when sender_id = #{userId} then receiver_id else sender_id end
+        )
+        order by m.create_time desc
+    </select>
+
+</mapper>

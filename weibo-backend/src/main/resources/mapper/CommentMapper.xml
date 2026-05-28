@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weibo.mapper.CommentMapper">
+    <select id="list" resultType="com.weibo.entity.Comment">
+        select c.*, u.username, u.avatar from comment c
+                                        left join user u on c.user_id = u.id
+        where c.weibo_id = #{weiboId}
+        order by c.create_time
+    </select>
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        insert into comment(weibo_id, user_id, content, parent_id, reply_to)
+        values(#{weiboId}, #{userId}, #{content}, #{parentId}, #{replyTo})
+    </insert>
+    <update id="incrementLike">
+        update comment set like_count = like_count + 1 where id = #{id}
+    </update>
+    <update id="decrementLike">
+        update comment set like_count = like_count - 1 where id = #{id}
+    </update>
+</mapper>
